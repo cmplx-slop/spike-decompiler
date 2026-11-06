@@ -29,13 +29,14 @@ export function kindOf(path: string, size: number): EntryKind {
 
 export function iconFor(kind: string, isOpen = false): string {
 	switch (kind) {
-		case "folder": return isOpen ? "fa-solid fa-folder-open" : "fa-solid fa-folder";
+		case "folder": return isOpen ? "fa-solid fa-folder-open text-warning" : "fa-solid fa-folder text-warning";
 		case "class":
 		case "source":
 		case "java": return "fa-solid fa-file-code";
 		case "image": return "fa-solid fa-file-image";
 		case "archive": return "fa-solid fa-file-zipper";
 		case "text": return "fa-solid fa-file-lines";
+		case "jar": return "fa-solid fa-file-zipper text-primary";
 		default: return "fa-solid fa-file";
 	}
 }

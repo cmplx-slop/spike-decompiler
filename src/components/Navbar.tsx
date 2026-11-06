@@ -30,7 +30,10 @@ export function Navbar() {
 					)}
 				</span>
 
-				<div class="d-flex align-items-center gap-2">
+				<div class="d-flex align-items-center justify-content-center gap-2">
+					<a class="text-body" href="https://github.com/cmplx-slop/spike-decompiler" target="_blank">
+						<i class="fa-brands fa-xl fa-github"></i>
+					</a>
 					<button
 						class="btn btn-outline-secondary btn-sm"
 						onClick={toggleTheme}

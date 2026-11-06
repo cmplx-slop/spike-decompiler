@@ -30,7 +30,6 @@ export function Editor({ path, text, language }: { path: string; text: string; l
 				editor = monaco.editor.create(host.current, {
 					readOnly: true,
 					automaticLayout: true,
-					minimap: { enabled: false },
 					scrollBeyondLastLine: false,
 					renderValidationDecorations: "off",
 					fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",

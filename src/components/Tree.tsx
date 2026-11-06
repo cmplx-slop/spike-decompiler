@@ -13,10 +13,10 @@ export function TreeRoot() {
 			</>
 		);
 	}
-	return <TreeFolder node={tree.value} depth={0} />;
+	return <TreeFolder root node={tree.value} depth={0} />;
 }
 
-function TreeFolder({ node, depth }: { node: TreeNode; depth: number }) {
+function TreeFolder({ node, depth, root }: { node: TreeNode; depth: number, root?: boolean }) {
 	const [open, setOpen] = useState(depth < 1);
 	const dirs = [...node.dirs.values()].sort((a, b) => a.name.localeCompare(b.name));
 	const files = [...node.files].sort((a, b) => baseName(a.path).localeCompare(baseName(b.path)));
@@ -25,7 +25,7 @@ function TreeFolder({ node, depth }: { node: TreeNode; depth: number }) {
 		<>
 			<button class="tree-row" style={`padding-left: ${depth * 14 + 6}px`} onClick={() => setOpen(!open)}>
 				<span class={`tree-chevron ${open ? "open" : ""}`}><i class="fa-solid fa-chevron-right" /></span>
-				<i class={`${iconFor("folder", open)} text-warning`} />
+				<i class={iconFor(root ? "jar" : "folder", open)} />
 				<span>{node.name}</span>
 			</button>
 			{open && (
