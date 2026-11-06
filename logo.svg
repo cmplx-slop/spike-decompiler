@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+	<!-- spike (jd-gui-web): source ({ }) you can see through the jar.
+	     Colors = Bootstrap dark theme: #212529 bg, amber archive, #0dcaf0 accent. -->
+	<rect width="512" height="512" rx="112" fill="#212529"/>
+	<rect width="512" height="512" rx="112" fill="none" stroke="#343a40" stroke-width="6"/>
+	<!-- jar -->
+	<rect x="166" y="128" width="180" height="36" rx="14" fill="#ffc107"/>
+	<rect x="144" y="176" width="224" height="216" rx="30" fill="none" stroke="#e9ecef" stroke-width="20"/>
+	<!-- { } decompiled source, visible through the glass -->
+	<path d="M248 216 C226 216 218 226 218 246 L218 268 C218 282 210 290 196 292
+	         C210 294 218 302 218 316 L218 338 C218 358 226 368 248 368"
+	      fill="none" stroke="#0dcaf0" stroke-width="24" stroke-linecap="round"/>
+	<path d="M264 216 C286 216 294 226 294 246 L294 268 C294 282 302 290 316 292
+	         C302 294 294 302 294 316 L294 338 C294 358 286 368 264 368"
+	      fill="none" stroke="#0dcaf0" stroke-width="24" stroke-linecap="round"/>
+</svg>

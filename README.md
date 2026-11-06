@@ -1,0 +1,110 @@
+# spike
+
+A JD-GUI-style class explorer that runs **entirely in the browser**: drag &
+drop a `.jar`, browse the package/class tree, click a class to read
+decompiled Java source in Monaco. The decompiler is JetBrains **FernFlower**
+(Apache-2.0), executed client-side by **CheerpJ 5** — a full OpenJDK JVM
+compiled to WebAssembly. No application server; deployment is plain static
+hosting.
+
+## Run it
+
+Requires [bun](https://bun.sh) ≥ 1.2 (uses `bun index.html` as dev server +
+bundler; bun transpiles the TypeScript/JSX — no other toolchain).
+
+```sh
+cd web
+bun install
+bun run fetch:engine    # pulls FernFlower from JetBrains' Maven repo (see below)
+bun index.html          # dev server with HMR → http://localhost:3000
+```
+
+Drop `spike/test-data.jar` (it decompiles the decompiler itself) or any jar.
+First run downloads the CheerpJ runtime (tens of MB, cached by the browser
+afterwards); the status bar bottom-left shows engine state.
+
+```sh
+cd web
+bun run typecheck       # tsc --noEmit
+bun run build           # dist/ = static files (bundle + engine jar) — deploy as-is
+```
+
+## What works today
+
+- drag & drop a `.jar/.zip/.war/.ear` (or file picker), indexed in an
+  archive worker via zip central-directory parsing — single entries inflate
+  on demand, never the whole jar
+- package tree with folders, per-kind icons, size labels, instant filter
+- click a class → FernFlower source in Monaco (read-only, dark theme),
+  multiple tabs with per-tab cache, decompile timing, copy + download
+- resource preview: text/json/xml with syntax, images, binary download
+- FernFlower option toggles (`dgs`/`dy`/`lit`), engine restart button
+- hostile-archive guards: path-traversal rejection, zip-bomb caps,
+  unsupported-method errors as tabs with retry
+- crash recovery: if the JVM worker dies it respawns on next use; UI state
+  survives
+
+## Stack
+
+| Layer | Choice |
+|---|---|
+| language | TypeScript (strict, tabs), JSX via `jsxImportSource: preact` |
+| UI | Preact 11 + `@preact/signals`, single state module (`src/state.ts`) |
+| styling | Bootstrap 5 + Font Awesome Free — **CDN only**, no npm deps |
+| editor | Monaco via `@monaco-editor/loader` (fetched from CDN at first use) |
+| tooling | bun dev server & bundler (`bun index.html`, `bun build`) |
+| zip | fflate, loaded as UMD via `importScripts` inside the worker |
+| JVM | CheerpJ 5 (loader `importScripts` in a Web Worker; OpenJDK-21-as-WASM) |
+| engine | `com.jetbrains.intellij.java:java-decompiler-engine:261.27258.136`, resolved at build time from JetBrains' IntelliJ Community repo (`bun run fetch:engine`); not vendored |
+
+## Engine sourcing
+
+`bun run fetch:engine` downloads the decompiler from JetBrains' **official
+Maven repository** (`www.jetbrains.com/intellij-repository/releases`) into
+`web/engine/` and writes `engine/engine.json` with the pinned version +
+SHA-256. `engine.ts` then *imports* both (bun's `with { type: "file" }`
+asset import + JSON import), so the jar ships as a content-hashed static
+asset in dev and `dist/`, and the app **verifies the digest at load**
+(plus Cache Storage, keyed by the hashed URL, so repeat loads are instant).
+
+Why not straight from JetBrains at runtime: the browser can only read a
+cross-origin response if the server opts in via CORS, and the JetBrains repo
+(like JitPack) sends no `Access-Control-Allow-Origin` header — verified in
+Nov 2026. Build tooling is not subject to CORS, so the artifact is resolved
+there at build time instead; the app still ships no binary blob — `web/engine/`
+is generated output. For your own CORS-enabled mirror (S3/CloudFront/CF
+Worker), set `globalThis.JD_ENGINE_URL = "https://…"` before load and the
+app fetches it directly.
+
+Version note: pin IntelliJ lines whose class files are ≤ Java 21 (CheerpJ 5
+runs OpenJDK 21; Java 25 is preview). Verified good: `261.27258.136`
+(major 65); `262+` targets Java 25 (major 69) — do not bump blindly.
+
+## Deploy (GitHub Pages)
+
+`.github/workflows/deploy.yml` builds and publishes `dist/` on every push to
+`main` (and on manual `workflow_dispatch`). CI mirrors local dev exactly:
+pinned bun `1.3.14`, `typecheck` + `test` gate the build, and `fetch:engine`
+pulls the jar from JetBrains (cached between runs). The build emits relative
+asset paths, so it works on project sites (`/<repo>/`) without base-URL
+config.
+
+One-time setup: in repo **Settings → Pages**, set **Source: GitHub Actions**
+(that's it — the workflow handles the rest).
+
+## Licensing caveat
+
+FernFlower is Apache-2.0; this app's code is MIT-friendly. CheerpJ is
+commercial software with a **free Community tier** (personal, educational,
+hobby, non-commercial OSS); commercial hosting needs an Application license —
+see [cheerpj.com/licensing](https://cheerpj.com/licensing). The decompiler is
+behind one module (`src/engine.ts`), so a TeaVM+CFR open-source pipeline can
+replace it later.
+
+## Layout
+
+```
+web/            the app (TS + Preact); web/engine/ generated by `bun run fetch:engine`
+spike/          Phase 0 single-file proof of concept (kept for reference)
+ARCHITECTURE.md full design: decision matrix, worker protocol, safety, roadmap
+```

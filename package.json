@@ -1,0 +1,22 @@
+{
+	"name": "spike",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"description": "Client-side Java decompiler (FernFlower via CheerpJ) — no server",
+	"scripts": {
+		"fetch:engine": "bun scripts/fetch-engine.ts",
+		"dev": "bun index.html",
+		"build": "bun scripts/fetch-engine.ts && bun build index.html --outdir dist",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@monaco-editor/loader": "^1.7.0",
+		"@preact/signals": "^2.11.4",
+		"fflate": "^0.8.3",
+		"preact": "^11.2.0"
+	},
+	"devDependencies": {
+		"typescript": "^5.9.0"
+	}
+}
