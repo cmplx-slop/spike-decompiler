@@ -32,6 +32,7 @@ jobs:
           path: engine
           key: engine-${{ hashFiles('scripts/fetch-engine.ts') }}
 
+      - run: bun scripts/fetch-engine.ts
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
       - run: bun test

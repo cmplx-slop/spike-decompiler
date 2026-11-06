@@ -10,7 +10,8 @@
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
+		"types": ["bun"],
 		"lib": ["esnext", "dom", "dom.iterable", "webworker"]
 	},
-	"include": ["src"]
+	"include": ["src", "scripts/*"],
 }
