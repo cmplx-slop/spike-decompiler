@@ -42,7 +42,7 @@ export function Content() {
 				{active.status === "error" && <ErrorPane tab={active} />}
 				{active.status === "ready" && active.kind === "image" && (
 					<div class="d-flex justify-content-center p-3">
-						<img src={active.blobUrl} class="img-fluid" style="max-height: 70vh" alt={active.path} />
+						<img src={active.blobUrl} class="img-fluid" style="max-height: 70vh; image-rendering: pixelated;" alt={active.path} />
 					</div>
 				)}
 				{active.status === "ready" && active.kind === "binary" && <BinaryPane tab={active} />}
