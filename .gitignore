@@ -1,3 +1,5 @@
 node_modules/
 dist/
-engine/
+# generated engine artifacts, root level ONLY — an unanchored "engine/" also
+# swallowed src/engine/ (CI was missing the whole interface/backend tree)
+/engine/
