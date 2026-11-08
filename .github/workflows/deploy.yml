@@ -34,6 +34,12 @@ jobs:
 
       - run: bun scripts/fetch-engine.ts
       - run: bun install --frozen-lockfile
+
+      # engine/ is gitignored, but the code imports engine/engine.json —
+      # fetch it BEFORE typecheck (cache misses would otherwise break tsc).
+      # fetch-engine.ts is idempotent; the build's re-run is a no-op.
+      - run: bun run fetch:engine
+
       - run: bun run typecheck
       - run: bun test
       - run: bun run build # fetch:engine + bun build -> dist/ (relative asset paths)
