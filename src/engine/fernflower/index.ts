@@ -35,6 +35,18 @@ export class Fernflower implements DecompilerEngine {
 		];
 	}
 
+	iconFor(path: string): string | undefined {
+		const p = path.toLowerCase();
+		if (p.endsWith(".class")) return "fa-solid fa-file-code text-info";
+		if (p.endsWith(".java")) return "fa-solid fa-file-code";
+		if (this.containerExtensions().some((ext) => p.endsWith(ext))) return "fa-solid fa-file-zipper text-primary";
+		return undefined;
+	}
+
+	languageFor(path: string): string | undefined {
+		return path.toLowerCase().endsWith(".java") ? "java" : undefined;
+	}
+
 	async openFile(buffer: ArrayBuffer): Promise<Container> {
 		this.archive ??= createArchive(); // one worker across files: load swaps the buffer
 		const archive = this.archive;

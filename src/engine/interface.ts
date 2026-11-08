@@ -76,6 +76,20 @@ export interface DecompilerEngine {
 	/** Name for the decompiled output of an entry (fernflower: a/b/Foo.class → a/b/Foo.java); falls back to the entry's base name. */
 	outputName?(path: string): string;
 
+	/**
+	 * Presentation: Font Awesome icon classes for entry/container paths this
+	 * engine claims (may include a color class); undefined → baseline iconFor(kind).
+	 */
+	iconFor?(path: string): string | undefined;
+
+	/**
+	 * Presentation: Monaco language id for text/source entries this engine
+	 * recognizes (e.g. .java files inside a jar); undefined → baseline
+	 * extension-based languageFor(). Decompiled output carries its language
+	 * on Content.language instead and takes precedence over this.
+	 */
+	languageFor?(path: string): string | undefined;
+
 	/** Restart the runtime (memory pressure / wedged state). */
 	restart(): Promise<void>;
 }

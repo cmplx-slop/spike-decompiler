@@ -22,7 +22,7 @@ export function Content() {
 							class="btn btn-sm border-0 p-0 text-inherit" style="font: inherit"
 							onClick={() => activateTab(t.id)} role="tab"
 						>
-							<i class={`${iconFor(t.kind)} me-1`} />
+							<i class={`${activeEngine.value?.iconFor?.(t.path) ?? iconFor(t.kind)} me-1`} />
 							{t.path.slice(t.path.lastIndexOf("/") + 1)}
 							{t.status === "loading" && (
 								<span class="spinner-border spinner-border-sm ms-2" />
@@ -52,7 +52,7 @@ export function Content() {
 					<Editor
 						path={active.path}
 						text={active.text ?? ""}
-						language={active.language ?? languageFor(active.path, active.kind)}
+						language={active.language ?? activeEngine.value?.languageFor?.(active.path) ?? languageFor(active.path, active.kind)}
 					/>
 				)}
 			</div>

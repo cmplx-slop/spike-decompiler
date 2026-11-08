@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { tree, filtered, query, openEntry, tabs, activeTabId, type Entry, type TreeNode } from "../state";
+import { activeEngine, tree, filtered, query, openEntry, tabs, activeTabId, type Entry, type TreeNode } from "../state";
 import { iconFor, formatBytes, baseName } from "../format";
 
 export function TreeRoot() {
@@ -25,7 +25,8 @@ function TreeFolder({ node, depth, root }: { node: TreeNode; depth: number, root
 		<>
 			<button class="tree-row" style={`padding-left: ${depth * 14 + 6}px`} onClick={() => setOpen(!open)}>
 				<span class={`tree-chevron ${open ? "open" : ""}`}><i class="fa-solid fa-chevron-right" /></span>
-				<i class={iconFor(root ? "archive" : "folder", open)} />
+				{/* engine-claimed icon (e.g. the container root), else baseline */}
+				<i class={root ? activeEngine.value?.iconFor?.(node.name) ?? iconFor("archive") : iconFor("folder", open)} />
 				<span>{node.name}</span>
 			</button>
 			{open && (
@@ -46,7 +47,8 @@ function FileRow({ entry, depth }: { entry: Entry; depth: number }) {
 			style={`padding-left: ${depth * 14 + 26}px`}
 			onClick={() => openEntry(entry.path)}
 		>
-			<i class={`${iconFor(entry.kind)} ${entry.kind === "bytecode" ? "text-info" : "text-body-secondary"}`} />
+			<i class={activeEngine.value?.iconFor?.(entry.path)
+				?? `${iconFor(entry.kind)} ${entry.kind === "bytecode" ? "text-info" : "text-body-secondary"}`} />
 			<span>{baseName(entry.path)}</span>
 			<span class="tree-size">{formatBytes(entry.size)}</span>
 		</button>
