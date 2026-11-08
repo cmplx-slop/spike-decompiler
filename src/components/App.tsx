@@ -4,7 +4,7 @@ import { Sidebar } from "./Sidebar";
 import { Content } from "./Content";
 import { StatusBar } from "./StatusBar";
 import { DragDropZone } from "./DragDropZone";
-import { dragDepth, openJarFile } from "../state";
+import { dragDepth, openFile } from "../state";
 
 export function App() {
 	// Whole-window drag & drop: dragenter fires for every element crossed,
@@ -18,7 +18,7 @@ export function App() {
 			e.preventDefault();
 			dragDepth.value = 0;
 			const file = e.dataTransfer?.files?.[0];
-			if (file) openJarFile(file);
+			if (file) openFile(file);
 		};
 		window.addEventListener("dragenter", onEnter);
 		window.addEventListener("dragover", onOver);

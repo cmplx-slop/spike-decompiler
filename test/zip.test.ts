@@ -1,10 +1,10 @@
 // Smoke test: run the real archive worker body under bun with a mocked
 // `self`, then index and extract from the vendored FernFlower jar.
-// Run: bun test (from web/)
+// Run: bun test
 
 import { test, expect } from "bun:test";
 import * as fflate from "fflate";
-import { archiveWorkerBody } from "../src/archive";
+import { archiveWorkerBody } from "../src/engine/fernflower/archive";
 
 type Msg = { id: number; ok: boolean; entries?: any[]; warnings?: string[]; bytes?: Uint8Array; error?: string };
 

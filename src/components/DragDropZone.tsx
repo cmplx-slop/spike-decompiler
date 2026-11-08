@@ -6,7 +6,7 @@ export function DragDropZone() {
 		<div class="drop-overlay">
 			<div class="drop-card">
 				<i class="fa-solid fa-box-open fa-2xl text-info d-block mb-3" />
-				drop the jar to open it
+				drop the file to open it
 			</div>
 		</div>
 	);

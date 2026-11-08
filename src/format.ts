@@ -1,7 +1,7 @@
 // Small presentation helpers: byte formatting, icons (Font Awesome free),
 // entry classification, and Monaco language ids by extension.
 
-export type EntryKind = "class" | "source" | "text" | "image" | "binary";
+export type EntryKind = "bytecode" | "source" | "text" | "image" | "binary";
 
 export function formatBytes(n: number): string {
 	if (n < 1024) return `${n} B`;
@@ -17,8 +17,10 @@ export const extOf = (path: string): string => {
 
 export const baseName = (path: string): string => path.slice(path.lastIndexOf("/") + 1);
 
-export function kindOf(path: string, size: number): EntryKind {
-	if (path.endsWith(".class")) return "class";
+// bytecodeExts = the active engine's supportedExtensions(); entries matching
+// them are "bytecode" (decompilable), regardless of language.
+export function kindOf(path: string, size: number, bytecodeExts: string[] = []): EntryKind {
+	if (bytecodeExts.some((ext) => path.toLowerCase().endsWith(ext))) return "bytecode";
 	const ext = extOf(path);
 	if (["png", "jpg", "jpeg", "gif", "svg", "webp", "ico", "bmp"].includes(ext)) return "image";
 	const texty = ["java", "txt", "properties", "json", "xml", "html", "htm", "css", "js", "yaml",
@@ -30,13 +32,12 @@ export function kindOf(path: string, size: number): EntryKind {
 export function iconFor(kind: string, isOpen = false): string {
 	switch (kind) {
 		case "folder": return isOpen ? "fa-solid fa-folder-open text-warning" : "fa-solid fa-folder text-warning";
-		case "class":
+		case "bytecode":
 		case "source":
 		case "java": return "fa-solid fa-file-code";
 		case "image": return "fa-solid fa-file-image";
-		case "archive": return "fa-solid fa-file-zipper";
+		case "archive": return "fa-solid fa-file-zipper text-primary"; // opened container (root node)
 		case "text": return "fa-solid fa-file-lines";
-		case "jar": return "fa-solid fa-file-zipper text-primary";
 		default: return "fa-solid fa-file";
 	}
 }

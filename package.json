@@ -3,7 +3,10 @@
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",
-	"description": "Client-side Java decompiler (FernFlower via CheerpJ) — no server",
+	"description": "Decompilers in your browser",
+	"repository": {
+		"url": "https://github.com/cmplx-slop/spike-decompiler"
+	},
 	"scripts": {
 		"fetch:engine": "bun scripts/fetch-engine.ts",
 		"dev": "bun index.html",

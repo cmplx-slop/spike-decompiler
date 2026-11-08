@@ -1,10 +1,12 @@
 import { useRef } from "preact/hooks";
 import logo from "../../logo.svg";
 import {
-	jarInfo, openJarFile, restartEngine,
-	engineOptions, OPTION_LABELS, toggleOption,
+	fileInfo, openFile, restartEngine,
+	engineOptions, optionDefs, toggleOption,
+	supportedContainerExtensions,
 	theme, toggleTheme,
 } from "../state";
+import { repo } from "../utils";
 
 export function Navbar() {
 	const picker = useRef<HTMLInputElement>(null);
@@ -18,20 +20,20 @@ export function Navbar() {
 				</span>
 
 				<span class="text-body-secondary small text-truncate" style="max-width: 38vw">
-					{jarInfo.value && (
+					{fileInfo.value && (
 						<span>
 							<i class="fa-solid fa-box-archive me-1" />
-							{jarInfo.value.name}
+							{fileInfo.value.name}
 							<span class="ms-2 text-body-tertiary">
-								{jarInfo.value.shown.toLocaleString()} entries
-								{jarInfo.value.hidden > 0 && ` (${jarInfo.value.hidden} unsafe entries hidden)`}
+								{fileInfo.value.shown.toLocaleString()} entries
+								{fileInfo.value.hidden > 0 && ` (${fileInfo.value.hidden} unsafe entries hidden)`}
 							</span>
 						</span>
 					)}
 				</span>
 
 				<div class="d-flex align-items-center justify-content-center gap-2">
-					<a class="text-body" href="https://github.com/cmplx-slop/spike-decompiler" target="_blank">
+					<a class="text-body" href={repo} target="_blank">
 						<i class="fa-brands fa-xl fa-github"></i>
 					</a>
 					<button
@@ -48,7 +50,7 @@ export function Navbar() {
 							<span class="d-none d-md-inline ms-1">Options</span>
 						</summary>
 						<div class="dropdown-menu show p-2" style="width: 18rem">
-							{Object.entries(OPTION_LABELS).map(([flag, label]) => (
+							{optionDefs.value.map(({ id: flag, label }) => (
 								<div class="form-check form-switch mb-1">
 									<input
 										class="form-check-input" type="checkbox" id={`opt-${flag}`}
@@ -70,13 +72,13 @@ export function Navbar() {
 
 					<button class="btn btn-info btn-sm" onClick={() => picker.current?.click()}>
 						<i class="fa-solid fa-folder-open" />
-						<span class="ms-1">Open jar</span>
+						<span class="ms-1">Open file</span>
 					</button>
 					<input
-						ref={picker} type="file" accept=".jar,.zip,.war,.ear" hidden
+						ref={picker} type="file" accept={supportedContainerExtensions.join(",")} hidden
 						onChange={(e) => {
 							const input = e.currentTarget as HTMLInputElement;
-							if (input.files?.[0]) openJarFile(input.files[0]);
+							if (input.files?.[0]) openFile(input.files[0]);
 							input.value = "";
 						}}
 					/>

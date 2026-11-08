@@ -1,21 +1,20 @@
-// Engine side: a Web Worker hosting CheerpJ 5 (OpenJDK-as-WASM) plus the
-// FernFlower jar (resolved from JetBrains' repo at build time — see
-// scripts/fetch-engine.ts). One JVM for the app's lifetime; per-class
-// decompilation. If the worker dies (OOM/crash), rpcify respawns it on the
-// next call, so UI state (tree, tabs, cache) survives.
+// FernFlower JVM host (backend-internal, not the UI contract): a Web Worker
+// hosting CheerpJ 5 (OpenJDK-as-WASM) plus the FernFlower jar (resolved from
+// JetBrains' repo at build time — see scripts/fetch-engine.ts). One JVM for
+// the app's lifetime; per-class decompilation. If the worker dies (OOM/
+// crash), rpcify respawns it on the next call, so UI state survives.
+// The UI-facing shape is Fernflower implements in ../interface.ts.
 
-import { makeInlineWorker, rpcify } from "./worker-rpc";
-import engineManifest from '../engine/engine.json';
+import type { EngineStatus } from "../interface";
+import { makeInlineWorker, rpcify } from "../../utils/worker-rpc";
+import engineManifest from '../../../engine/engine.json';
 
 //@ts-expect-error
-import engine from '../engine/java-decompiler.jar' with { type: 'file' };
+import engine from '../../../engine/java-decompiler.jar' with { type: 'file' };
 
-export interface EngineStatus {
-	state: "booting" | "ready" | "error";
-	detail: string;
-}
-
-export interface Engine {
+// Not the UI contract (that is DecompilerEngine) — this is just the raw
+// JVM host behind it; Fernflower adapts it in ./index.ts.
+export interface JvmHost {
 	boot(): Promise<void>;
 	decompileClass(entryName: string, bytes: Uint8Array, options?: string[]): Promise<string>;
 	restart(): Promise<void>;
@@ -39,7 +38,7 @@ export interface Engine {
 // Escape hatch: set globalThis.JD_ENGINE_URL = "<absolute https url>" on a
 // mirror that sends CORS headers (e.g. your own S3/CloudFront/Worker).
 
-const ENGINE_CACHE = "spike-engine-v2"; // v1 may hold poisoned HTML fallbacks
+const ENGINE_CACHE = "fernflower-engine-v2"; // v1 may hold poisoned HTML fallbacks
 let jarCache: ArrayBuffer | null = null;
 
 // Dev/static servers (bun dev server included!) answer unknown paths with
@@ -234,12 +233,12 @@ function engineWorkerBody(): void {
 	};
 }
 
-export function createEngine(onStatus: (s: EngineStatus) => void): Engine {
+export function createEngine(onStatus: (s: EngineStatus) => void): JvmHost {
 	const call = rpcify(() => makeInlineWorker(engineWorkerBody), (msg) => {
 		if (msg.type === "engine-status") onStatus({ state: msg.state, detail: msg.detail || "" });
 	});
 
-	const engine: Engine = {
+	const engine: JvmHost = {
 		// Boot eagerly so the runtime download / JIT warmup overlaps with the
 		// user reading the drop-zone screen. Fetch + verify the jar here first.
 		async boot() {

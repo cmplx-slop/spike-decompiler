@@ -1,6 +1,8 @@
 import {
 	tabs, activeTab, activateTab, closeTab, retryTab,
-	jarInfo, engineStatus, engineOptions, downloadText, downloadBlob,
+	fileInfo, engineStatus, engineOptions, activeEngine, defaultEngineName,
+	supportedContainerExtensions,
+	downloadText, downloadBlob,
 	type Tab,
 } from "../state";
 import { languageFor, iconFor, formatBytes } from "../format";
@@ -50,7 +52,7 @@ export function Content() {
 					<Editor
 						path={active.path}
 						text={active.text ?? ""}
-						language={languageFor(active.path, active.kind)}
+						language={active.language ?? languageFor(active.path, active.kind)}
 					/>
 				)}
 			</div>
@@ -60,7 +62,10 @@ export function Content() {
 
 function Toolbar({ tab }: { tab: Tab }) {
 	const isSource = tab.kind === "source";
-	const outName = isSource ? tab.path.replace(/\.class$/, ".java") : tab.path.slice(tab.path.lastIndexOf("/") + 1);
+	// Output name is an engine convention (fernflower: Foo.class → Foo.java),
+	// not something the UI should hardcode.
+	const outName = (isSource ? activeEngine.value?.outputName?.(tab.path) : undefined)
+		?? tab.path.slice(tab.path.lastIndexOf("/") + 1);
 
 	const copy = () => navigator.clipboard?.writeText(tab.text ?? "");
 	const download = async () => {
@@ -89,7 +94,9 @@ function Toolbar({ tab }: { tab: Tab }) {
 }
 
 function Loading({ tab }: { tab: Tab }) {
-	const what = tab.kind === "class" ? "Decompiling with FernFlower…" : "Reading…";
+	const what = tab.kind === "bytecode"
+		? `Decompiling with ${activeEngine.value?.name ?? "engine"}…`
+		: "Reading…";
 	return (
 		<div class="welcome">
 			<div class="text-center text-body-secondary">
@@ -138,23 +145,23 @@ function Welcome() {
 		<section class="app-main">
 			<div class="welcome">
 				<div class="text-center">
-					{jarInfo.value ? (
+					{fileInfo.value ? (
 						<>
 							<i class="fa-solid fa-arrow-pointer fa-3x text-body-secondary mb-3" />
-							<div class="fs-6 text-body-secondary">pick a class from the tree to decompile it</div>
+							<div class="fs-6 text-body-secondary">pick an entry from the tree to open it</div>
 						</>
 					) : (
 						<>
 							<i class="fa-solid fa-box-open fa-3x text-info mb-3" />
-							<div class="fs-5">drop a <code>.jar</code> anywhere on this page</div>
+							<div class="fs-5">drop a <code>{supportedContainerExtensions.join(" / ")}</code> file anywhere on this page</div>
 							<div class="text-body-secondary small mt-1">
-								or use the <strong>Open jar</strong> button — nothing is uploaded, all work happens in this tab
+								or use the <strong>Open file</strong> button — nothing is uploaded, all work happens in this tab
 							</div>
 						</>
 					)}
 					<div class="mt-3 small font-monospace">
 						<span class={`dot ${es.state}`} />
-						{es.state === "ready" ? "decompiler engine ready (FernFlower on CheerpJ)"
+						{es.state === "ready" ? `decompiler engine ready (${activeEngine.value?.name ?? defaultEngineName})`
 							: es.state === "booting" ? `engine: ${es.detail || "booting…"}`
 							: `engine error: ${es.detail}`}
 					</div>

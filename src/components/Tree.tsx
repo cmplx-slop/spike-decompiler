@@ -25,7 +25,7 @@ function TreeFolder({ node, depth, root }: { node: TreeNode; depth: number, root
 		<>
 			<button class="tree-row" style={`padding-left: ${depth * 14 + 6}px`} onClick={() => setOpen(!open)}>
 				<span class={`tree-chevron ${open ? "open" : ""}`}><i class="fa-solid fa-chevron-right" /></span>
-				<i class={iconFor(root ? "jar" : "folder", open)} />
+				<i class={iconFor(root ? "archive" : "folder", open)} />
 				<span>{node.name}</span>
 			</button>
 			{open && (
@@ -46,7 +46,7 @@ function FileRow({ entry, depth }: { entry: Entry; depth: number }) {
 			style={`padding-left: ${depth * 14 + 26}px`}
 			onClick={() => openEntry(entry.path)}
 		>
-			<i class={`${iconFor(entry.kind)} ${entry.kind === "class" ? "text-info" : "text-body-secondary"}`} />
+			<i class={`${iconFor(entry.kind)} ${entry.kind === "bytecode" ? "text-info" : "text-body-secondary"}`} />
 			<span>{baseName(entry.path)}</span>
 			<span class="tree-size">{formatBytes(entry.size)}</span>
 		</button>

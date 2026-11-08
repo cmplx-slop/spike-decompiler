@@ -13,5 +13,5 @@
 		"types": ["bun"],
 		"lib": ["esnext", "dom", "dom.iterable", "webworker"]
 	},
-	"include": ["src", "scripts/*"],
+	"include": ["src", "scripts/*", "test"],
 }
